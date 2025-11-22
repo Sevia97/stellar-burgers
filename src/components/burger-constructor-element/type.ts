@@ -4,4 +4,7 @@ export type BurgerConstructorElementProps = {
   ingredient: TConstructorIngredient;
   index: number;
   totalItems: number;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 };

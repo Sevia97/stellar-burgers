@@ -1,24 +1,39 @@
-import styles from './ingredients-category.module.css';
-import { forwardRef } from 'react';
-import { TIngredientsCategoryUIProps } from './type';
+import { FC, memo, forwardRef } from 'react';
 import { BurgerIngredient } from '@components';
+import { TIngredient } from '@utils-types';
+import styles from './ingredients-category.module.css';
 
-export const IngredientsCategoryUI = forwardRef<
-  HTMLUListElement,
-  TIngredientsCategoryUIProps
->(({ title, titleRef, ingredients, ingredientsCounters }, ref) => (
-  <>
-    <h3 className='text text_type_main-medium mt-10 mb-6' ref={titleRef}>
-      {title}
-    </h3>
-    <ul className={styles.items} ref={ref}>
-      {ingredients.map((ingredient) => (
-        <BurgerIngredient
-          ingredient={ingredient}
-          key={ingredient._id}
-          count={ingredientsCounters[ingredient._id]}
-        />
-      ))}
-    </ul>
-  </>
-));
+interface IngredientsCategoryProps {
+  title: string;
+  titleRef: React.RefObject<HTMLHeadingElement>;
+  ingredients: TIngredient[];
+  onAddIngredient: (ingredient: TIngredient) => void;
+  ingredientsCounters: { [key: string]: number }; // ✅
+}
+
+export const IngredientsCategoryUI = memo(
+  forwardRef<HTMLDivElement, IngredientsCategoryProps>(
+    (
+      { title, titleRef, ingredients, onAddIngredient, ingredientsCounters },
+      ref
+    ) => (
+      <div ref={ref} className={styles.category}>
+        <h2 className={styles.title} ref={titleRef}>
+          {title}
+        </h2>
+        <div className={styles.ingredients_grid}>
+          {ingredients.map((ingredient) => (
+            <BurgerIngredient
+              key={ingredient._id}
+              ingredient={ingredient}
+              count={ingredientsCounters[ingredient._id] || 0}
+              onAdd={onAddIngredient}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  )
+);
+
+IngredientsCategoryUI.displayName = 'IngredientsCategoryUI';

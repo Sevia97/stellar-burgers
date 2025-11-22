@@ -4,6 +4,7 @@ import { Tab } from '@zlden/react-developer-burger-ui-components';
 import styles from './burger-ingredients.module.css';
 import { BurgerIngredientsUIProps } from './type';
 import { IngredientsCategory } from '@components';
+import { TIngredient } from '@utils-types';
 
 export const BurgerIngredientsUI: FC<BurgerIngredientsUIProps> = memo(
   ({
@@ -17,7 +18,9 @@ export const BurgerIngredientsUI: FC<BurgerIngredientsUIProps> = memo(
     bunsRef,
     mainsRef,
     saucesRef,
-    onTabClick
+    onTabClick,
+    onAddIngredient,
+    ingredientsCounters
   }) => (
     <>
       <section className={styles.burger_ingredients}>
@@ -48,18 +51,24 @@ export const BurgerIngredientsUI: FC<BurgerIngredientsUIProps> = memo(
             titleRef={titleBunRef}
             ingredients={buns}
             ref={bunsRef}
+            onAddIngredient={onAddIngredient}
+            ingredientsCounters={ingredientsCounters}
           />
           <IngredientsCategory
             title='Начинки'
             titleRef={titleMainRef}
             ingredients={mains}
             ref={mainsRef}
+            onAddIngredient={onAddIngredient}
+            ingredientsCounters={ingredientsCounters}
           />
           <IngredientsCategory
             title='Соусы'
             titleRef={titleSaucesRef}
             ingredients={sauces}
             ref={saucesRef}
+            onAddIngredient={onAddIngredient}
+            ingredientsCounters={ingredientsCounters}
           />
         </div>
       </section>

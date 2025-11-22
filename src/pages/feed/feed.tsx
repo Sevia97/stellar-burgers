@@ -1,15 +1,40 @@
 import { Preloader } from '@ui';
 import { FeedUI } from '@ui-pages';
-import { TOrder } from '@utils-types';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
+import { useDispatch, useSelector } from '../../services/store';
+import { getFeeds } from '../../services/selectors';
+import {
+  wsConnectionStart,
+  wsConnectionClosed
+} from '../../services/feed/feedSlice';
 
 export const Feed: FC = () => {
-  /** TODO: взять переменную из стора */
-  const orders: TOrder[] = [];
+  const dispatch = useDispatch();
+  const { orders, loading } = useSelector(getFeeds);
 
-  if (!orders.length) {
+  useEffect(() => {
+    dispatch(wsConnectionStart('wss://norma.nomoreparties.space/orders/all'));
+
+    return () => {
+      dispatch(wsConnectionClosed());
+    };
+  }, [dispatch]);
+
+  if (loading || !orders.length) {
     return <Preloader />;
   }
 
-  <FeedUI orders={orders} handleGetFeeds={() => {}} />;
+  return (
+    <FeedUI
+      orders={orders}
+      handleGetFeeds={() => {
+        dispatch(wsConnectionClosed());
+        dispatch(
+          wsConnectionStart('wss://norma.nomoreparties.space/orders/all')
+        );
+      }}
+    />
+  );
 };
+
+export default Feed;
