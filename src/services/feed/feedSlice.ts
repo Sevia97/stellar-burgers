@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TFeed, TOrder } from '@utils-types';
+import { TOrder } from '@utils-types';
 
 export type TFeedState = {
   orders: TOrder[];
@@ -37,9 +37,10 @@ export const feedSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    wsConnectionClosed: (state) => {
+    wsConnectionClosed: (state, action: PayloadAction<number>) => {
       state.wsConnected = false;
       state.loading = false;
+      state.error = null;
     },
     wsGetOrders: (
       state,
@@ -53,6 +54,13 @@ export const feedSlice = createSlice({
       state.total = action.payload.total;
       state.totalToday = action.payload.totalToday;
       state.loading = false;
+    },
+    closeConnection: (state) => {
+      state.wsConnected = false;
+    },
+    refreshOrders: (state) => {
+      state.loading = true;
+      state.error = null;
     }
   }
 });
@@ -62,7 +70,9 @@ export const {
   wsConnectionSuccess,
   wsConnectionError,
   wsConnectionClosed,
-  wsGetOrders
+  wsGetOrders,
+  closeConnection,
+  refreshOrders
 } = feedSlice.actions;
 
 export const feedReducer = feedSlice.reducer;

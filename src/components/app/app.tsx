@@ -27,7 +27,7 @@ import {
 import '../../index.css';
 import styles from './app.module.css';
 
-import { AppHeader, Modal } from '@components';
+import { AppHeader, Modal, Preloader } from '@components';
 
 // Импортируем store и Provider
 import { Provider } from 'react-redux';
@@ -49,7 +49,7 @@ const OnlyUnAuth = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   if (!isAuthChecked) {
-    return <div>Загрузка...</div>;
+    return <Preloader />;
   }
 
   return isAuthenticated ? (
@@ -64,7 +64,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   if (!isAuthChecked) {
-    return <div>Загрузка...</div>;
+    return <Preloader />;
   }
 
   return isAuthenticated ? (
@@ -102,7 +102,7 @@ const ModalWrapper = ({
 };
 // --- Конец ModalWrapper ---
 
-const App = () => {
+const AppContent = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const backgroundLocation = location.state?.background || null;
@@ -114,7 +114,7 @@ const App = () => {
   return (
     <div className={styles.app}>
       <AppHeader />
-      <main>
+      <main className={styles.main}>
         {/* Основные маршруты */}
         <Routes location={backgroundLocation || location}>
           <Route path='/' element={<ConstructorPage />} />
@@ -225,12 +225,12 @@ const App = () => {
   );
 };
 
-const AppWithRouterAndStore = () => (
+const App = () => (
   <Provider store={store}>
     <BrowserRouter>
-      <App />
+      <AppContent />
     </BrowserRouter>
   </Provider>
 );
 
-export default AppWithRouterAndStore;
+export default App;

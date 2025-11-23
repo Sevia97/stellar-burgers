@@ -7,7 +7,8 @@ import { BurgerConstructorUI } from '../ui/burger-constructor';
 import { setOrder, setLoading } from '../../services/order/orderSlice';
 import {
   removeIngredient,
-  moveIngredient
+  moveIngredient,
+  resetCart
 } from '../../services/cart/cartSlice';
 import { orderBurgerApi } from '../../utils/burger-api';
 
@@ -40,6 +41,8 @@ export const BurgerConstructor: FC = () => {
     orderBurgerApi(ingredientsIds)
       .then((response) => {
         dispatch(setOrder(response.order));
+        // Очищаем конструктор только при успешном ответе сервера
+        dispatch(resetCart());
       })
       .catch((err) => {
         console.error('Ошибка:', err);

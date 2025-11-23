@@ -3,10 +3,41 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { useSelector } from '../../services/store';
+import { useParams } from 'react-router-dom';
 
 export const OrderInfo: FC = () => {
-  const orderData = useSelector((store) => store.order.currentOrder);
+  const { number } = useParams<{ number: string }>();
+  const orderNumber = parseInt(number || '0');
+
+  // Получаем заказы из разных источников
+  const feedOrders = useSelector((store) => store.feed.orders);
+  const orderHistory = useSelector((store) => store.orderHistory.orders);
+  const currentOrder = useSelector((store) => store.order.currentOrder);
   const ingredients = useSelector((store) => store.ingredients.items);
+
+  // Ищем заказ в разных источниках
+  const orderData = useMemo(() => {
+    // Если есть currentOrder (для модального окна создания заказа)
+    if (currentOrder) {
+      return currentOrder;
+    }
+
+    // Ищем заказ в ленте заказов
+    const feedOrder = feedOrders.find((order) => order.number === orderNumber);
+    if (feedOrder) {
+      return feedOrder;
+    }
+
+    // Ищем заказ в истории заказов
+    const historyOrder = orderHistory.find(
+      (order) => order.number === orderNumber
+    );
+    if (historyOrder) {
+      return historyOrder;
+    }
+
+    return null;
+  }, [currentOrder, feedOrders, orderHistory, orderNumber]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
@@ -49,7 +80,14 @@ export const OrderInfo: FC = () => {
   }, [orderData, ingredients]);
 
   if (!orderInfo) {
-    return <Preloader />;
+    return (
+      <div className='pt-10 pl-10 pr-10'>
+        <Preloader />
+        <p className='text text_type_main-default text_color_inactive mt-4'>
+          Загрузка информации о заказе #{orderNumber}...
+        </p>
+      </div>
+    );
   }
 
   return <OrderInfoUI orderInfo={orderInfo} />;

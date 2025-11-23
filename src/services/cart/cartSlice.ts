@@ -1,5 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TIngredient } from '../../utils/types';
+import { v4 as uuidv4 } from 'uuid';
 
 export type TConstructorIngredient = TIngredient & {
   id: string;
@@ -19,20 +20,26 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addIngredient: (state, action) => {
-      const item = action.payload;
-      const id = Math.random().toString(36).substr(2, 9);
-
-      if (item.type === 'bun') {
-        state.bun = item;
-      } else {
-        state.ingredients.push({ ...item, id });
-      }
+    addIngredient: {
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        const item = action.payload;
+        if (item.type === 'bun') {
+          state.bun = item;
+        } else {
+          state.ingredients.push(item);
+        }
+      },
+      prepare: (ingredient: TIngredient) => ({
+        payload: { ...ingredient, id: uuidv4() }
+      })
     },
-    removeIngredient: (state, action) => {
+    removeIngredient: (state, action: PayloadAction<number>) => {
       state.ingredients.splice(action.payload, 1);
     },
-    moveIngredient: (state, action) => {
+    moveIngredient: (
+      state,
+      action: PayloadAction<{ dragIndex: number; hoverIndex: number }>
+    ) => {
       const { dragIndex, hoverIndex } = action.payload;
       const temp = state.ingredients[dragIndex];
       state.ingredients[dragIndex] = state.ingredients[hoverIndex];

@@ -1,4 +1,3 @@
-// services/root-reducer.ts
 import { combineReducers } from '@reduxjs/toolkit';
 import { ingredientsReducer } from './ingredients/ingredientsSlice';
 import { cartReducer } from './cart/cartSlice';

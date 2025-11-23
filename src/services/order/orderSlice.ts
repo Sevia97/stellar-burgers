@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
 
 type TOrderState = {
@@ -17,17 +17,21 @@ export const orderSlice = createSlice({
   name: 'order',
   initialState,
   reducers: {
-    setOrder: (state, action) => {
+    setOrder: (state, action: PayloadAction<TOrder | null>) => {
       state.currentOrder = action.payload;
     },
     clearOrder: (state) => {
       state.currentOrder = null;
     },
-    setLoading: (state, action: { payload: boolean }) => {
+    setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
+    },
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
     }
   }
 });
 
-export const { setOrder, clearOrder, setLoading } = orderSlice.actions;
+export const { setOrder, clearOrder, setLoading, setError } =
+  orderSlice.actions;
 export const orderReducer = orderSlice.reducer;

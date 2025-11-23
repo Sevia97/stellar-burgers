@@ -11,7 +11,11 @@ export const BurgerIngredients: FC = () => {
   const { items } = useSelector((store) => store.ingredients);
   const ingredientsCounters = useSelector(getIngredientsCounters);
 
-  // Фильтруем
+  if (!Array.isArray(items)) {
+    console.error('Items is not an array:', items);
+    return <div>Ошибка загрузки ингредиентов</div>;
+  }
+
   const buns = items.filter((item) => item.type === 'bun');
   const mains = items.filter((item) => item.type === 'main');
   const sauces = items.filter((item) => item.type === 'sauce');
@@ -51,7 +55,6 @@ export const BurgerIngredients: FC = () => {
       titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Функция для добавления ингредиента
   const handleAddIngredient = (ingredient: TIngredient) => {
     console.log('Adding ingredient:', ingredient.name);
     dispatch(addIngredient(ingredient));

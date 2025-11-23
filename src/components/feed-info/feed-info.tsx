@@ -5,6 +5,7 @@ import { FeedInfoUI } from '../ui/feed-info';
 
 export const FeedInfo: FC = () => {
   const { orders, total, totalToday } = useSelector(getFeeds);
+
   const { readyOrders, pendingOrders } = useMemo(() => {
     const ready: number[] = [];
     const pending: number[] = [];
@@ -12,7 +13,7 @@ export const FeedInfo: FC = () => {
     orders.forEach((order) => {
       if (order.status === 'done') {
         ready.push(order.number);
-      } else if (order.status === 'pending' || order.status === 'created') {
+      } else if (order.status === 'pending') {
         pending.push(order.number);
       }
     });

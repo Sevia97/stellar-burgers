@@ -6,14 +6,7 @@ export function getCookie(name: string): string | undefined {
         '=([^;]*)'
     )
   );
-  if (matches) return decodeURIComponent(matches[1]);
-
-  if (name === 'accessToken') {
-    const token = localStorage.getItem('accessToken');
-    return token || undefined;
-  }
-
-  return undefined;
+  return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 export function setCookie(
@@ -36,8 +29,10 @@ export function setCookie(
   if (exp && exp instanceof Date) {
     props.expires = exp.toUTCString();
   }
+
   value = encodeURIComponent(value);
   let updatedCookie = name + '=' + value;
+
   for (const propName in props) {
     updatedCookie += '; ' + propName;
     const propValue = props[propName];
@@ -45,6 +40,7 @@ export function setCookie(
       updatedCookie += '=' + propValue;
     }
   }
+
   document.cookie = updatedCookie;
 }
 

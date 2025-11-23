@@ -9,9 +9,10 @@
   text-decoration: none;
   color: unset;
   background-color: #1c1c21;
-  border-radius: 40px;
-  min-width: 576px;
+  padding: 24px;
+  margin-bottom: 16px;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .order_info {

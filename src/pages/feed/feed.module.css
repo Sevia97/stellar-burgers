@@ -1,0 +1,69 @@
+.container {
+  padding: 40px 20px 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  height: calc(100vh - 88px); /* Высота viewport минус высота header */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Убираем скролл у всего контейнера страницы */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-shrink: 0; /* Запрещаем сжатие хедера */
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  height: 100%;
+  flex: 1;
+  min-height: 0; /* Критически важно для ограничения высоты */
+}
+
+.ordersSection {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ordersContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  min-height: 0;
+  max-height: 100%;
+  border: 1px solid transparent; /* Для отладки, можно убрать */
+}
+
+/* Стилизация скроллбара */
+.ordersContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ordersContainer::-webkit-scrollbar-track {
+  background: #2f2f37;
+  border-radius: 4px;
+}
+
+.ordersContainer::-webkit-scrollbar-thumb {
+  background: #8585ad;
+  border-radius: 4px;
+}
+
+.ordersContainer::-webkit-scrollbar-thumb:hover {
+  background: #a5a5d1;
+}
+
+.infoSection {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

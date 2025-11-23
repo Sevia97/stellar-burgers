@@ -6,9 +6,44 @@ import {
 } from 'react-redux';
 
 import { rootReducer } from './root-reducer';
+import { socketMiddleware } from './middleware/socketMiddleware';
+import {
+  wsConnectionStart,
+  wsConnectionSuccess,
+  wsConnectionError,
+  wsConnectionClosed,
+  wsGetOrders
+} from './feed/feedSlice';
+import {
+  wsConnectionStart as orderHistoryWsStart,
+  wsConnectionSuccess as orderHistoryWsSuccess,
+  wsConnectionError as orderHistoryWsError,
+  wsConnectionClosed as orderHistoryWsClosed,
+  wsGetOrders as orderHistoryWsGetOrders
+} from './orderHistory/orderHistorySlice';
 
-const store = configureStore({
+const feedMiddleware = socketMiddleware({
+  wsInit: wsConnectionStart.type,
+  onOpen: wsConnectionSuccess.type,
+  onClose: wsConnectionClosed.type,
+  onError: wsConnectionError.type,
+  onMessage: wsGetOrders.type
+});
+
+const orderHistoryMiddleware = socketMiddleware({
+  wsInit: orderHistoryWsStart.type,
+  onOpen: orderHistoryWsSuccess.type,
+  onClose: orderHistoryWsClosed.type,
+  onError: orderHistoryWsError.type,
+  onMessage: orderHistoryWsGetOrders.type
+});
+
+export const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .concat(feedMiddleware)
+      .concat(orderHistoryMiddleware),
   devTools: process.env.NODE_ENV !== 'production'
 });
 

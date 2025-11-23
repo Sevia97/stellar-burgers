@@ -7,8 +7,7 @@ import {
   updateUserApi,
   logoutApi
 } from '../../utils/burger-api';
-import { AppDispatch } from '../store';
-import { setCookie } from '../../utils/cookie';
+import { setCookie, deleteCookie } from '../../utils/cookie';
 
 type TAuthState = {
   user: TUser | null;
@@ -29,10 +28,9 @@ export const loginUser = createAsyncThunk(
   async (credentials: { email: string; password: string }) => {
     const response = await loginUserApi(credentials);
 
-    localStorage.setItem('accessToken', response.accessToken);
+    setCookie('accessToken', response.accessToken, { expires: 1200 });
     localStorage.setItem('refreshToken', response.refreshToken);
     localStorage.setItem('user', JSON.stringify(response.user));
-    setCookie('accessToken', response.accessToken, { expires: 1200 });
     return response.user;
   }
 );
@@ -41,7 +39,7 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData: { email: string; password: string; name: string }) => {
     const response = await registerUserApi(userData);
-    localStorage.setItem('accessToken', response.accessToken);
+    setCookie('accessToken', response.accessToken, { expires: 1200 });
     localStorage.setItem('refreshToken', response.refreshToken);
     localStorage.setItem('user', JSON.stringify(response.user));
     return response.user;
@@ -63,18 +61,9 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const logoutUser = () => async (dispatch: AppDispatch) => {
-  try {
-    await logoutApi();
-  } catch (error) {
-    console.error('Ошибка при выходе (API):', error);
-  } finally {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    dispatch(setUser(null));
-  }
-};
+export const logoutUser = createAsyncThunk('auth/logout', async () => {
+  await logoutApi();
+});
 
 export const checkUserAuth = createAsyncThunk(
   'auth/checkAuth',
@@ -86,9 +75,9 @@ export const checkUserAuth = createAsyncThunk(
       try {
         await dispatch(getUser()).unwrap();
       } catch (error) {
-        localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
+        deleteCookie('accessToken');
       }
     }
     dispatch(setAuthChecked(true));
@@ -111,7 +100,6 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -125,7 +113,6 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Ошибка авторизации';
       })
-      // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -139,21 +126,24 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Ошибка регистрации';
       })
-      // Get User
       .addCase(getUser.fulfilled, (state, action) => {
         state.user = action.payload;
       })
       .addCase(getUser.rejected, (state) => {
         state.user = null;
       })
-      // Update User
       .addCase(updateUser.fulfilled, (state, action) => {
         state.user = action.payload;
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.error = action.error.message || 'Ошибка обновления профиля';
       })
-      // Check Auth
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        deleteCookie('accessToken');
+      })
       .addCase(checkUserAuth.fulfilled, (state) => {
         state.isAuthChecked = true;
       });
