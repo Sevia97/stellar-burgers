@@ -37,7 +37,7 @@ export const feedSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    wsConnectionClosed: (state, action: PayloadAction<number>) => {
+    wsConnectionClosed: (state) => {
       state.wsConnected = false;
       state.loading = false;
       state.error = null;

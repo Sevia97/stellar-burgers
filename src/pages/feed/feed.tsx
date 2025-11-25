@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   wsConnectionStart,
@@ -13,35 +13,91 @@ import styles from './feed.module.css';
 export const Feed: FC = () => {
   const dispatch = useDispatch();
   const { orders, loading, error } = useSelector(getFeeds);
+  const initialized = useRef(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    dispatch(wsConnectionStart('wss://norma.education-services.ru/orders/all'));
+    // Подключаемся только один раз при монтировании
+    if (!initialized.current) {
+      console.log('Feed: First mount, connecting WebSocket...');
+      initialized.current = true;
+
+      const wsUrl = 'wss://norma.education-services.ru/orders/all';
+      dispatch(wsConnectionStart(wsUrl));
+    }
 
     return () => {
-      dispatch(closeConnection());
+      // Не закрываем соединение при обновлениях компонента
+      console.log('Feed: Cleanup (not closing WebSocket)');
     };
   }, [dispatch]);
 
   const handleRefresh = () => {
+    console.log('Feed: Manual refresh requested');
+    setIsRefreshing(true);
+
+    // Сначала закрываем соединение
     dispatch(closeConnection());
+
+    // Даем время на корректное закрытие
     setTimeout(() => {
-      dispatch(
-        wsConnectionStart('wss://norma.education-services.ru/orders/all')
-      );
-    }, 100);
+      const wsUrl = 'wss://norma.education-services.ru/orders/all';
+      console.log('Feed: Starting new connection after refresh');
+      dispatch(wsConnectionStart(wsUrl));
+    }, 500);
   };
 
-  if (loading) {
-    return <Preloader />;
+  // Сбрасываем флаг обновления когда данные загрузились
+  useEffect(() => {
+    if (isRefreshing && !loading && orders.length > 0) {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing, loading, orders.length]);
+
+  // Показываем полноэкранный прелоадер при загрузке или принудительном обновлении
+  const showFullscreenLoader = (loading && orders.length === 0) || isRefreshing;
+
+  if (showFullscreenLoader) {
+    return (
+      <div
+        className='pt-30 pl-10 pr-10'
+        style={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <Preloader />
+        <p className='text text_type_main-default text_color_inactive mt-4'>
+          {isRefreshing
+            ? 'Обновление ленты заказов...'
+            : 'Загрузка ленты заказов...'}
+        </p>
+      </div>
+    );
   }
 
-  if (error) {
+  if (error && orders.length === 0) {
     return (
-      <div className='text text_type_main-default text_color_error mt-10'>
-        Ошибка: {error}
+      <div
+        className='text text_type_main-default text_color_error mt-10'
+        style={{
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <h2 className='text text_type_main-medium mb-4'>
+          Не удалось загрузить ленту заказов
+        </h2>
+        <p>Ошибка: {error}</p>
         <button
           onClick={handleRefresh}
-          className='ml-4 text text_type_main-default button'
+          className='ml-4 text text_type_main-default button mt-4'
         >
           Повторить попытку
         </button>
@@ -56,20 +112,19 @@ export const Feed: FC = () => {
         <button
           onClick={handleRefresh}
           className='text text_type_main-default button'
+          disabled={isRefreshing}
         >
-          Обновить
+          {isRefreshing ? 'Обновление...' : 'Обновить'}
         </button>
       </div>
 
       <div className={styles.content}>
-        {/* Левая колонка - лента заказов со скроллом */}
         <section className={styles.ordersSection}>
           <div className={styles.ordersContainer}>
             <OrdersList orders={orders} />
           </div>
         </section>
 
-        {/* Правая колонка - статистика */}
         <section className={styles.infoSection}>
           <FeedInfo />
         </section>

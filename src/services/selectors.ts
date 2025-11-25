@@ -44,7 +44,8 @@ export const getFeeds = createSelector([feedSelector], (feed) => ({
   total: feed.total,
   totalToday: feed.totalToday,
   loading: feed.loading,
-  error: feed.error
+  error: feed.error,
+  wsConnected: feed.wsConnected
 }));
 
 // Селектор для истории заказов

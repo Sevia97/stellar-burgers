@@ -64,20 +64,18 @@ export const orderHistorySlice = createSlice({
     closeConnection: (state) => {
       state.wsConnected = false;
     },
-    // Дополнительный reducer для очистки ошибок
     clearError: (state) => {
       state.error = null;
     }
   },
   extraReducers: (builder) => {
     builder
-      // Обработка fetchOrderHistory
       .addCase(fetchOrderHistory.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchOrderHistory.fulfilled, (state, action) => {
-        state.orders = action.payload.orders.reverse(); // Новые заказы первыми
+        state.orders = action.payload.orders.reverse();
         state.loading = false;
         state.error = null;
         console.log(
