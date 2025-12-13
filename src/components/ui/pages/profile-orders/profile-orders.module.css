@@ -1,15 +1,48 @@
-.menu {
-  width: 320px;
-}
-
-.main {
+.container {
   display: flex;
-  height: 100%;
-  width: 1240px;
+  max-width: 1240px;
+  margin: 120px auto 0;
+  padding: 0 20px;
+  height: calc(100vh - 208px);
   overflow: hidden;
-  margin: 0 auto;
+  gap: 60px;
 }
 
-.orders {
-  width: 100%;
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.ordersSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; 
+}
+
+.ordersContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  min-height: 0;
+  max-height: 100%;
+}
+
+/* Стилизация скроллбара */
+.ordersContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ordersContainer::-webkit-scrollbar-track {
+  background: #2f2f37;
+  border-radius: 4px;
+}
+
+.ordersContainer::-webkit-scrollbar-thumb {
+  background: #8585ad;
+  border-radius: 4px;
+}
+
+.ordersContainer::-webkit-scrollbar-thumb:hover {
+  background: #a5a5d1;
 }

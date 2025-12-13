@@ -30,6 +30,7 @@ export type TOrdersData = {
   orders: TOrder[];
   total: number;
   totalToday: number;
+  ingredients: string[];
 };
 
 export type TUser = {
@@ -38,3 +39,14 @@ export type TUser = {
 };
 
 export type TTabMode = 'bun' | 'sauce' | 'main';
+
+export type TOrderData = {
+  ingredients: string[];
+};
+
+export type TFeed = {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+};
+

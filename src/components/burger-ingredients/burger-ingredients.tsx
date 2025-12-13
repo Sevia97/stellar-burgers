@@ -1,14 +1,24 @@
 import { useState, useRef, useEffect, FC } from 'react';
 import { useInView } from 'react-intersection-observer';
-
-import { TTabMode } from '@utils-types';
+import { useSelector, useDispatch } from '../../services/store';
+import { TTabMode, TIngredient } from '@utils-types';
 import { BurgerIngredientsUI } from '../ui/burger-ingredients';
+import { addIngredient } from '../../services/cart/cartSlice';
+import { getIngredientsCounters } from '../../services/selectors';
 
 export const BurgerIngredients: FC = () => {
-  /** TODO: взять переменные из стора */
-  const buns = [];
-  const mains = [];
-  const sauces = [];
+  const dispatch = useDispatch();
+  const { items } = useSelector((store) => store.ingredients);
+  const ingredientsCounters = useSelector(getIngredientsCounters);
+
+  if (!Array.isArray(items)) {
+    console.error('Items is not an array:', items);
+    return <div>Ошибка загрузки ингредиентов</div>;
+  }
+
+  const buns = items.filter((item) => item.type === 'bun');
+  const mains = items.filter((item) => item.type === 'main');
+  const sauces = items.filter((item) => item.type === 'sauce');
 
   const [currentTab, setCurrentTab] = useState<TTabMode>('bun');
   const titleBunRef = useRef<HTMLHeadingElement>(null);
@@ -18,11 +28,9 @@ export const BurgerIngredients: FC = () => {
   const [bunsRef, inViewBuns] = useInView({
     threshold: 0
   });
-
   const [mainsRef, inViewFilling] = useInView({
     threshold: 0
   });
-
   const [saucesRef, inViewSauces] = useInView({
     threshold: 0
   });
@@ -47,7 +55,10 @@ export const BurgerIngredients: FC = () => {
       titleSaucesRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  return null;
+  const handleAddIngredient = (ingredient: TIngredient) => {
+    console.log('Adding ingredient:', ingredient.name);
+    dispatch(addIngredient(ingredient));
+  };
 
   return (
     <BurgerIngredientsUI
@@ -62,6 +73,10 @@ export const BurgerIngredients: FC = () => {
       mainsRef={mainsRef}
       saucesRef={saucesRef}
       onTabClick={onTabClick}
+      onAddIngredient={handleAddIngredient}
+      ingredientsCounters={ingredientsCounters}
     />
   );
 };
+
+export default BurgerIngredients;

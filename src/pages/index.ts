@@ -7,3 +7,5 @@ export * from './profile';
 export * from './profile-orders';
 export * from './register';
 export * from './reset-password';
+export { default as OrderInfo } from './order-info';
+export { default as IngredientDetails } from './ingredient-details';
