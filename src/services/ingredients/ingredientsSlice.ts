@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { TIngredient } from '@utils-types';
 import { getIngredientsApi } from '../../utils/burger-api';
-import { TIngredient } from '../../utils/types';
 
 export type TIngredientsState = {
   items: TIngredient[];
@@ -8,22 +8,21 @@ export type TIngredientsState = {
   error: string | null;
 };
 
-const initialState: TIngredientsState = {
+// Экспортируем initialState
+export const initialState: TIngredientsState = {
   items: [],
-  loading: true,
+  loading: false,
   error: null
 };
 
 export const fetchIngredients = createAsyncThunk(
-  'ingredients/fetchAll',
+  'ingredients/fetchIngredients',
   async () => {
-    const data = await getIngredientsApi();
-    console.log('Ingredients API response:', data);
-    return data;
+    const ingredients = await getIngredientsApi();
+    return ingredients;
   }
 );
 
-// Слайс
 export const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
@@ -35,19 +34,16 @@ export const ingredientsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchIngredients.fulfilled, (state, action) => {
+        state.items = action.payload;
         state.loading = false;
-        if (Array.isArray(action.payload)) {
-          state.items = action.payload;
-        } else {
-          console.error('Payload is not an array:', action.payload);
-          state.items = [];
-          state.error = 'Некорректный формат данных';
-        }
+        state.error = null;
       })
       .addCase(fetchIngredients.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Ошибка загрузки ингредиентов';
-        state.items = [];
+        state.error =
+          (action.payload as string) ||
+          action.error?.message ||
+          'Ошибка загрузки ингредиентов';
       });
   }
 });

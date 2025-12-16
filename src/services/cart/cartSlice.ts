@@ -7,11 +7,11 @@ export type TConstructorIngredient = TIngredient & {
 };
 
 export type TCartState = {
-  bun: TIngredient | null;
+  bun: TConstructorIngredient | null;
   ingredients: TConstructorIngredient[];
 };
 
-const initialState: TCartState = {
+export const initialState: TCartState = {
   bun: null,
   ingredients: []
 };
@@ -41,14 +41,20 @@ export const cartSlice = createSlice({
       action: PayloadAction<{ dragIndex: number; hoverIndex: number }>
     ) => {
       const { dragIndex, hoverIndex } = action.payload;
-      const temp = state.ingredients[dragIndex];
-      state.ingredients[dragIndex] = state.ingredients[hoverIndex];
-      state.ingredients[hoverIndex] = temp;
+      const ingredient = state.ingredients[dragIndex];
+      state.ingredients.splice(dragIndex, 1);
+      state.ingredients.splice(hoverIndex, 0, ingredient);
     },
-    resetCart: () => initialState
+    resetCart: () => initialState,
+    clearCart: () => initialState
   }
 });
 
-export const { addIngredient, removeIngredient, moveIngredient, resetCart } =
-  cartSlice.actions;
+export const {
+  addIngredient,
+  removeIngredient,
+  moveIngredient,
+  resetCart,
+  clearCart
+} = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;
