@@ -10,7 +10,8 @@ export type TFeedState = {
   wsConnected: boolean;
 };
 
-const initialState: TFeedState = {
+// Экспортируем initialState
+export const initialState: TFeedState = {
   orders: [],
   total: 0,
   totalToday: 0,

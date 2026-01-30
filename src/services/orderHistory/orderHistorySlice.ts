@@ -9,7 +9,7 @@ export type TOrderHistoryState = {
   wsConnected: boolean;
 };
 
-const initialState: TOrderHistoryState = {
+export const initialState: TOrderHistoryState = {
   orders: [],
   loading: true,
   error: null,
@@ -57,10 +57,11 @@ export const orderHistorySlice = createSlice({
       state.error = null;
     },
     wsGetOrders: (state, action: PayloadAction<{ orders: TOrder[] }>) => {
-      state.orders = action.payload.orders.reverse();
+      state.orders = [...action.payload.orders].reverse();
       state.loading = false;
       state.error = null;
     },
+
     closeConnection: (state) => {
       state.wsConnected = false;
     },
@@ -75,19 +76,13 @@ export const orderHistorySlice = createSlice({
         state.error = null;
       })
       .addCase(fetchOrderHistory.fulfilled, (state, action) => {
-        state.orders = action.payload.orders.reverse();
+        state.orders = [...action.payload.orders].reverse();
         state.loading = false;
         state.error = null;
-        console.log(
-          'Order history loaded successfully:',
-          action.payload.orders.length,
-          'orders'
-        );
       })
       .addCase(fetchOrderHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
-        console.error('Failed to load order history:', action.payload);
       });
   }
 });
